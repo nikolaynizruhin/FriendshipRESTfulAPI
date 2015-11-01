@@ -1,4 +1,8 @@
 <h1>FriendshipRESTfulAPI</h1>
+<ul>
+    <li>Laravel 5.1</li>
+    <li>Redis</li>
+</ul>
 <table>
     <tr>
         <td>POST</td>
