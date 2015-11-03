@@ -12,12 +12,12 @@ class FriendsController extends Controller
     /**
      * Friends list
      *
-     * @param $meId
+     * @param $userId
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function showFriends($meId)
+    public function showFriends($userId)
     {
-        $friendsId = Redis::sMembers('uid:' . $meId . ':friendslist');
+        $friendsId = Redis::sMembers('uid:' . $userId . ':friendslist');
         if ($friendsId) {
             foreach ($friendsId as $friendId) {
                 $friendsList[$friendId] = Redis::hGetAll('uid:' . $friendId . ':info');

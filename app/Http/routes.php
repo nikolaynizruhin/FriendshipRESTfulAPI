@@ -13,15 +13,15 @@
 
 Route::group(['prefix' => 'api'], function()
 {
-    Route::post('{meId}/pendingrequest/{id}', 'FriendshipController@pendingRequest')
-        ->where(['meId' => '[0-9]+', 'id' => '[0-9]+']);
-    Route::get('{meId}/requests', 'FriendshipController@requests')
-        ->where('meId', '[0-9]+');
-    Route::put('{meId}/accept/{id}', 'FriendshipController@accept')
-        ->where(['meId' => '[0-9]+', 'id' => '[0-9]+']);
-    Route::delete('{meId}/reject/{id}', 'FriendshipController@reject')
+    Route::post('{userId}/pendingrequest/{id}', 'FriendshipController@pendingRequest')
+        ->where(['userId' => '[0-9]+', 'id' => '[0-9]+']);
+    Route::get('{userId}/requests', 'FriendshipController@requests')
+        ->where('userId', '[0-9]+');
+    Route::put('{userId}/accept/{id}', 'FriendshipController@accept')
+        ->where(['userId' => '[0-9]+', 'id' => '[0-9]+']);
+    Route::delete('{userId}/reject/{id}', 'FriendshipController@reject')
         ->where(['meId' => '[0-9]+', 'id' => '[0-9]+']);
 
-    Route::get('{meId}/friends', 'FriendsController@showFriends')
-        ->where('meId', '[0-9]+');
+    Route::get('{userId}/friends', 'FriendsController@showFriends')
+        ->where('userId', '[0-9]+');
 });

@@ -6,27 +6,27 @@
 <table>
     <tr>
         <td>POST</td>
-        <td>api/{meId}/pendingrequest/{id}</td>
+        <td>api/{userId}/pendingrequest/{id}</td>
         <td>Pending friend request</td>
     </tr>
     <tr>
         <td>GET</td>
-        <td>api/{meId}/requests</td>
+        <td>api/{userId}/requests</td>
         <td>Friend requests</td>
     </tr>
     <tr>
         <td>PUT</td>
-        <td>api/{meId}/accept/{id}</td>
+        <td>api/{userId}/accept/{id}</td>
         <td>Friend request accept</td>
     </tr>
     <tr>
         <td>DELETE</td>
-        <td>api/{meId}/reject/{id}</td>
+        <td>api/{userId}/reject/{id}</td>
         <td>Friend request reject</td>
     </tr>
     <tr>
         <td>GET</td>
-        <td>api/{meId}/friends</td>
+        <td>api/{userId}/friends</td>
         <td>Friends list</td>
     </tr>
 </table>

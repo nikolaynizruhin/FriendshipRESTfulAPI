@@ -12,31 +12,31 @@ class FriendshipController extends Controller
     /**
      * Pending friend request
      *
-     * @param $meId
+     * @param $userId
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function pendingRequest($meId, $id)
+    public function pendingRequest($userId, $id)
     {
-        if ($id == $meId) {
+        if ($id == $userId) {
             return abort(400, 'You can not add yourself as a friend.');
-        } elseif (Redis::sIsMember('uid:' . $meId . ':friendslist', $id)) {
+        } elseif (Redis::sIsMember('uid:' . $userId . ':friendslist', $id)) {
             return abort(400, 'Already your friend.');
         }
-        Redis::sAdd('uid:' . $id . ':requests', $meId);
-        Redis::sAdd('uid:' . $meId . ':pendingrequests', $id);
+        Redis::sAdd('uid:' . $id . ':requests', $userId);
+        Redis::sAdd('uid:' . $userId . ':pendingrequests', $id);
         return response('', 201);
     }
 
     /**
      * Friend requests
      *
-     * @param $meId
+     * @param $userId
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function requests($meId)
+    public function requests($userId)
     {
-        $friendsId = Redis::sMembers('uid:' . $meId . ':requests');
+        $friendsId = Redis::sMembers('uid:' . $userId . ':requests');
         if ($friendsId) {
             foreach ($friendsId as $friendId) {
                 $friendsList[$friendId] = Redis::hGetAll('uid:' . $friendId . ':info');
@@ -48,33 +48,33 @@ class FriendshipController extends Controller
     /**
      * Friend request accept
      *
-     * @param $meId
+     * @param $userId
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function accept($meId, $id)
+    public function accept($userId, $id)
     {
-        if (!Redis::sIsMember('uid:' . $meId . ':requests', $id)) {
+        if (!Redis::sIsMember('uid:' . $userId . ':requests', $id)) {
             return abort(400, 'No friendship request to accept.');
         }
-        Redis::sAdd('uid:' . $id . ':friendslist', $meId);
-        Redis::sAdd('uid:' . $meId . ':friendslist', $id);
-        Redis::sRem('uid:' . $meId . ':requests', $id);
-        Redis::sRem('uid:' . $id . ':pendingrequests', $meId);
+        Redis::sAdd('uid:' . $id . ':friendslist', $userId);
+        Redis::sAdd('uid:' . $userId . ':friendslist', $id);
+        Redis::sRem('uid:' . $userId . ':requests', $id);
+        Redis::sRem('uid:' . $id . ':pendingrequests', $userId);
         return response('', 201);
     }
 
     /**
      * Friend request reject
      *
-     * @param $meId
+     * @param $userId
      * @param $id
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function reject($meId, $id)
+    public function reject($userId, $id)
     {
-        Redis::sRem('uid:' . $meId . ':requests', $id);
-        Redis::sRem('uid:' . $id . ':pendingrequests', $meId);
+        Redis::sRem('uid:' . $userId . ':requests', $id);
+        Redis::sRem('uid:' . $id . ':pendingrequests', $userId);
         return response('', 200);
     }
 }
