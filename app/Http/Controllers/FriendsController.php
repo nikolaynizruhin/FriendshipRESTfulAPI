@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Auth;
 use Redis;
-use App\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -14,23 +12,17 @@ class FriendsController extends Controller
     /**
      * Friends list
      *
+     * @param $meId
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function showFriends()
+    public function showFriends($meId)
     {
-        $users =  User::whereIn('id', Redis::sMembers('uid:' . Auth::User()->id . ':friendslist'));
-        return response($users->get()->toArray(), 200);
-    }
-
-    /**
-     * Friends list of user
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
-    public function showOtherFriends($id)
-    {
-        $users =  User::whereIn('id', Redis::sMembers('uid:' . $id . ':friendslist'));
-        return response($users->get()->toArray(), 200);
+        $friendsId = Redis::sMembers('uid:' . $meId . ':friendslist');
+        if ($friendsId) {
+            foreach ($friendsId as $friendId) {
+                $friendsList[$friendId] = Redis::hGetAll('uid:' . $friendId . ':info');
+            }
+            return response($friendsList, 200);
+        } else return response('', 200);
     }
 }
