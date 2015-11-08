@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 class FriendsController extends Controller
 {
     /**
-     * Show user friends
+     * Show friends
      *
      * @param $userId
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
@@ -22,7 +22,7 @@ class FriendsController extends Controller
     }
 
     /**
-     * Show user friends of friends to N nesting level
+     * Show friends of friends to N nesting level
      *
      * @param $userId
      * @param $n
