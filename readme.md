@@ -12,7 +12,7 @@
     <tr>
         <td>GET</td>
         <td>api/{userId}/requests</td>
-        <td>Friend requests</td>
+        <td>Show friend requests</td>
     </tr>
     <tr>
         <td>PUT</td>
@@ -27,6 +27,11 @@
     <tr>
         <td>GET</td>
         <td>api/{userId}/friends</td>
-        <td>Friends list</td>
+        <td>Show user friends</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td>api/{userId}/friendsOfFriends/{n}</td>
+        <td>Show user friends of friends to N nesting level</td>
     </tr>
 </table>

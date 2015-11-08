@@ -29,7 +29,7 @@ class FriendshipController extends Controller
     }
 
     /**
-     * Friend requests
+     * Show friend requests
      *
      * @param $userId
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response

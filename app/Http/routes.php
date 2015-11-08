@@ -24,4 +24,6 @@ Route::group(['prefix' => 'api'], function()
 
     Route::get('{userId}/friends', 'FriendsController@showFriends')
         ->where('userId', '[0-9]+');
+    Route::get('{userId}/friendsOfFriends/{n}', 'FriendsController@showFriendsOfFriends')
+        ->where(['id' => '[0-9]+', 'n' => '[0-9]+']);
 });
