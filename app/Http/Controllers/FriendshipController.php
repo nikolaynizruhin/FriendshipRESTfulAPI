@@ -36,13 +36,7 @@ class FriendshipController extends Controller
      */
     public function requests($userId)
     {
-        $friendsId = Redis::sMembers('uid:' . $userId . ':requests');
-        if ($friendsId) {
-            foreach ($friendsId as $friendId) {
-                $friendsList[$friendId] = Redis::hGetAll('uid:' . $friendId . ':info');
-            }
-            return response($friendsList, 200);
-        } else return response('', 200);
+        return response(Redis::sMembers('uid:' . $userId . ':requests'), 200);
     }
 
     /**

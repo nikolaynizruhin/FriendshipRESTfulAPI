@@ -10,6 +10,20 @@ use App\Http\Controllers\Controller;
 class FriendsController extends Controller
 {
     /**
+     * Friends of friends
+     *
+     * @var
+     */
+    private $friendsOfFriends;
+
+    /**
+     * Current level unique friends
+     *
+     * @var
+     */
+    private $currentLevelUniqueFriends;
+
+    /**
      * Show friends
      *
      * @param $userId
@@ -17,8 +31,7 @@ class FriendsController extends Controller
      */
     public function showFriends($userId)
     {
-        $friendsIds = Redis::sMembers('uid:' . $userId . ':friendslist');
-        return $this->getFriends($friendsIds) ? $this->getFriends($friendsIds) : '';
+        return response(Redis::sMembers('uid:' . $userId . ':friendslist'), 200);
     }
 
     /**
@@ -27,79 +40,34 @@ class FriendsController extends Controller
      * @param $userId
      * @param $n
      * @param int $i
-     * @return string
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function showFriendsOfFriends($userId, $n, $i = 1)
+    public function friendsOfFriends($userId, $n, $i = 1)
     {
         if ($i == 1) {
-            Redis::sAdd('nestingLevel:' . $i . ':friendslist', Redis::sMembers('uid:' . $userId . ':friendslist'));
-            Redis::sAdd('friendsOfFriends', Redis::sMembers('uid:' . $userId . ':friendslist'));
-            Redis::sAdd('friendsOfFriends', $userId);
+            $this->friendsOfFriends = Redis::sMembers('uid:' . $userId . ':friendslist');
+            $this->friendsOfFriends[] = $userId;
+            $this->currentLevelUniqueFriends = $this->friendsOfFriends;
         } else {
-            $previousLevel = $i - 1;
-            $previousLevelFriends = Redis::sMembers('nestingLevel:' . $previousLevel . ':friendslist');
-            Redis::del('nestingLevel:' . $previousLevel . ':friendslist');
-            foreach ($previousLevelFriends as $previousLevelFriend) {
-                Redis::sAdd('currentLevelFriends', Redis::sMembers('uid:' . $previousLevelFriend . ':friendslist'));
-            }
-            $currentLevelFriends = Redis::sMembers('currentLevelFriends');
-            Redis::del('currentLevelFriends');
-            foreach ($currentLevelFriends as $currentLevelFriend) {
-                if (!Redis::sIsMember('friendsOfFriends', $currentLevelFriend)) {
-                    Redis::sAdd('nestingLevel:' . $i . ':friendslist', $currentLevelFriend);
-                    Redis::sAdd('friendsOfFriends', $currentLevelFriend);
+            foreach ($this->currentLevelUniqueFriends as $friendId) {
+                $currentLevelFriends = Redis::sMembers('uid:' . $friendId . ':friendslist');
+                foreach ($currentLevelFriends as $currentLevelFriend) {
+                    if (!in_array($currentLevelFriend, $this->friendsOfFriends)) {
+                        $this->friendsOfFriends[] = $currentLevelFriend;
+                        $uniqueFriends[] = $currentLevelFriend;
+                    }
                 }
             }
-        }
-        if (!Redis::sMembers('nestingLevel:' . $i . ':friendslist')) {
-            $friendsIds = $this->getFriendsOfFriends($userId);
-            $this->removeTemporarySets($i);
-            return $this->getFriends($friendsIds) ? $this->getFriends($friendsIds) : '';
-        }
-        if ($i == $n) {
-            $friendsIds = $this->getFriendsOfFriends($userId);
-            $this->removeTemporarySets($i);
-            return $this->getFriends($friendsIds);
-        }
-        return $this->showFriendsOfFriends($userId, $n, $i + 1);
-    }
-
-    /**
-     * Get friends info
-     *
-     * @param $ids
-     * @return string
-     */
-    private function getFriends($ids)
-    {
-        if ($ids) {
-            foreach ($ids as $id) {
-                $friends[$id] = Redis::hGetAll('uid:' . $id . ':info');
+            if (isset($uniqueFriends)) {
+                $this->currentLevelUniqueFriends = $uniqueFriends;
             }
-            return $friends;
-        } else return '';
-    }
-
-    /**
-     * Get friends of friends ids
-     *
-     * @param $userId
-     * @return array
-     */
-    private function getFriendsOfFriends($userId)
-    {
-        Redis::sRem('friendsOfFriends', $userId);
-        return Redis::sMembers('friendsOfFriends');
-    }
-
-    /**
-     * Remove temporary redis sets
-     *
-     * @param $i
-     */
-    private function removeTemporarySets($i)
-    {
-        Redis::del('friendsOfFriends');
-        Redis::del('nestingLevel:' . $i . ':friendslist');
+        }
+        if (empty($this->currentLevelUniqueFriends)) {
+            return response($this->friendsOfFriends, 200);
+        }
+        if ($n == $i) {
+            return response($this->friendsOfFriends, 200);
+        }
+        return $this->friendsOfFriends($userId, $n, $i + 1);
     }
 }

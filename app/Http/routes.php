@@ -20,10 +20,10 @@ Route::group(['prefix' => 'api'], function()
     Route::put('{userId}/accept/{id}', 'FriendshipController@accept')
         ->where(['userId' => '[0-9]+', 'id' => '[0-9]+']);
     Route::delete('{userId}/reject/{id}', 'FriendshipController@reject')
-        ->where(['meId' => '[0-9]+', 'id' => '[0-9]+']);
+        ->where(['userId' => '[0-9]+', 'id' => '[0-9]+']);
 
     Route::get('{userId}/friends', 'FriendsController@showFriends')
         ->where('userId', '[0-9]+');
-    Route::get('{userId}/friendsOfFriends/{n}', 'FriendsController@showFriendsOfFriends')
-        ->where(['id' => '[0-9]+', 'n' => '[0-9]+']);
+    Route::get('{userId}/friendsOfFriends/{n}', 'FriendsController@friendsOfFriends')
+        ->where(['userId' => '[0-9]+', 'n' => '[0-9]+']);
 });
