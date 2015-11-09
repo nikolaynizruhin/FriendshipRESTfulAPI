@@ -49,8 +49,8 @@ class FriendsController extends Controller
             $this->friendsOfFriends[] = $userId;
             $this->currentLevelUniqueFriends = $this->friendsOfFriends;
         } else {
-            foreach ($this->currentLevelUniqueFriends as $friendId) {
-                $currentLevelFriends = Redis::sMembers('uid:' . $friendId . ':friendslist');
+            foreach ($this->currentLevelUniqueFriends as $friend) {
+                $currentLevelFriends = Redis::sMembers('uid:' . $friend . ':friendslist');
                 foreach ($currentLevelFriends as $currentLevelFriend) {
                     if (!in_array($currentLevelFriend, $this->friendsOfFriends)) {
                         $this->friendsOfFriends[] = $currentLevelFriend;
